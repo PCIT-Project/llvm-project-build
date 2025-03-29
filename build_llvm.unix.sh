@@ -1,9 +1,6 @@
 ###############################################################
 # setup directories
 
-
-
-NOW=$( date '+%H:%M:%S' )
 NOW=$( date '+%H:%M:%S' )
 echo [36m\<PCIT Project - build LLVM\>[35m Setting up required directories[90m \(time started: $NOW\)[0m
 
@@ -23,7 +20,6 @@ if $RET_CODE; then
 	echo [36m\<PCIT Project - build LLVM\>[31m Failed to clone LLVM[0m
 	exit $RET_CODE
 fi
-
 
 
 
