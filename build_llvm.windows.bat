@@ -3,6 +3,32 @@ SETLOCAL EnableDelayedExpansion
 
 
 rem =============================================================
+rem setup args
+
+GOTO:MAIN
+
+:print_help
+    SETLOCAL ENABLEDELAYEDEXPANSION
+       echo Usage: build_llvm.windows.bat [Debug^|Release]  [--no-clone^|]
+       echo:
+       echo 	--no-clone option:	if set, skip the cloning step 
+    ENDLOCAL
+EXIT /B 0
+
+
+
+:MAIN
+
+if "%1" neq "Debug" ( if "%1" neq "Release" (
+	call:print_help
+	exit /b 0
+))
+
+
+
+
+
+rem =============================================================
 rem setup directories
 
 echo [36m^<PCIT Project - build LLVM^>[35m Setting up required directories[90m (^time started: %time%)[0m
@@ -16,12 +42,18 @@ rem clone LLVM
 echo [36m^<PCIT Project - build LLVM^>[35m Cloning LLVM (https://github.com/PCIT-Project/llvm-project.git)[90m (^time started: %time%)[0m
 
 
-git clone https://github.com/PCIT-Project/llvm-project.git --depth=1
+if "%2" == "--no-clone" (
+	echo skipping cloning...
 
-if %ERRORLEVEL% neq 0 (
-	echo [36m^<PCIT Project - build LLVM^>[31m Failed to clone LLVM[0m
-	exit /b %ERRORLEVEL%
+) else (
+	git clone https://github.com/PCIT-Project/llvm-project.git --depth=1
+
+	if %ERRORLEVEL% neq 0 (
+		echo [36m^<PCIT Project - build LLVM^>[31m Failed to clone LLVM[0m
+		exit /b %ERRORLEVEL%
+	)
 )
+
 
 
 
@@ -33,19 +65,43 @@ echo [36m^<PCIT Project - build LLVM^>[35m Preparing to build LLVM[90m (^time
 
 cd ./build
 
-cmake "../llvm-project/llvm" ^
-	-G "Visual Studio 17 2022" ^
-	-DCMAKE_BUILD_TYPE=Release ^
-	-DCMAKE_INSTALL_PREFIX="../llvm-project/llvm/build-output" ^
-	-DLLVM_ENABLE_PROJECTS="lld;clang" ^
-	-DLLVM_BUILD_TOOLS=OFF ^
-	-DLLVM_ENABLE_ASSERTIONS=OFF ^
-	-DLLVM_ENABLE_BINDINGS=OFF ^
-	-DLLVM_ENABLE_EH=OFF ^
-	-DLLVM_ENABLE_UNWIND_TABLES=OFF ^
-	-DLLVM_INCLUDE_BENCHMARKS=OFF ^
-	-DLLVM_INCLUDE_EXAMPLES=OFF
-rem -LLVM_INCLUDE_TOOLS ?
+
+if "%1" == "Debug" (
+
+	cmake "../llvm-project/llvm" ^
+		-G "Visual Studio 17 2022" ^
+		-DCMAKE_INSTALL_PREFIX="../llvm-project/llvm/build-output" ^
+		-DCMAKE_BUILD_TYPE="Debug" ^
+		-DLLVM_ENABLE_PROJECTS="lld;clang" ^
+		-DLLVM_TARGETS_TO_BUILD="AArch64;RISCV;WebAssembly;X86" ^
+		-DLLVM_BUILD_TOOLS=OFF ^
+		-DLLVM_ENABLE_ASSERTIONS=OFF ^
+		-DLLVM_ENABLE_BINDINGS=OFF ^
+		-DLLVM_ENABLE_EH=OFF ^
+		-DLLVM_ENABLE_UNWIND_TABLES=OFF ^
+		-DLLVM_INCLUDE_BENCHMARKS=OFF ^
+		-DLLVM_INCLUDE_EXAMPLES=OFF
+
+) else (
+	
+	cmake "../llvm-project/llvm" ^
+		-G "Visual Studio 17 2022" ^
+		-DCMAKE_INSTALL_PREFIX="../llvm-project/llvm/build-output" ^
+		-DCMAKE_BUILD_TYPE=Release ^
+		-DCMAKE_MSCV_RUNTIME_LIBRARY=MultiThreaded ^
+		-DLLVM_ENABLE_PROJECTS="lld;clang" ^
+		-DLLVM_TARGETS_TO_BUILD="AArch64;RISCV;WebAssembly;X86" ^
+		-DLLVM_BUILD_TOOLS=OFF ^
+		-DLLVM_ENABLE_ASSERTIONS=OFF ^
+		-DLLVM_ENABLE_BINDINGS=OFF ^
+		-DLLVM_ENABLE_EH=OFF ^
+		-DLLVM_ENABLE_UNWIND_TABLES=OFF ^
+		-DLLVM_INCLUDE_BENCHMARKS=OFF ^
+		-DLLVM_INCLUDE_EXAMPLES=OFF
+
+)
+
+
 	
 
 
