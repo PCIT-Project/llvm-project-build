@@ -1,6 +1,19 @@
 # Change Log
 
 <!---------------------------------->
+<a name="v0.3.0"></a>
+## v0.3.0
+- Added `--build` arg
+	- Replaces old build arg
+- Added `--git-repo` arg
+- Added `--version` arg
+- Added `--skip-includes` arg
+- Added `--help` arg
+- Renamed `--no-clone` arg to `--skip-clone`
+- Fixed release builds actually building debug builds
+
+
+<!---------------------------------->
 <a name="v0.2.0"></a>
 ## v0.2.0
 - Added build arg
